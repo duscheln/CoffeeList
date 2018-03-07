@@ -14,22 +14,20 @@ from hashlib import md5
 from math import sqrt
 import time
 
+from config import DBuser, DBpassword, DBname, DBhost, DBport, DBengine
 
-user = 'coffee'
-password = 'ilikecoffee'
-db = 'coffeelist'
-host = 'localhost'
-port = 5432
-
-url = 'sqlite:///TestDB.db'
-#url = 'postgresql://{}:{}@{}:{}/{}'
-url = url.format(user, password, host, port, db)
+if DBengine == 'sql':
+    url = 'sqlite:///TestDB.db'
+elif DBengine == 'postgresql':
+    url = 'postgresql://{}:{}@{}:{}/{}'
+    url = url.format(DBuser, DBpassword, DBhost, DBport, DBname)
 
 engine = create_engine(url)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-SecKey = 'supersecretpassword'
+from config import URLpassword
+SecKey = URLpassword
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = url
@@ -281,7 +279,9 @@ def getunpaid(userid,itemid):
     nUnpaid = db.session.query(history).\
             filter(history.userid == userid).\
             filter(history.itemid == itemid).\
-            filter(extract('month', history.date) == datetime.now().month).count()
+            filter(extract('month', history.date) == datetime.now().month).\
+            filter(extract('year', history.date) == datetime.now().year)\
+            .count()
     
     if nUnpaid == None:
         nUnpaid = 0

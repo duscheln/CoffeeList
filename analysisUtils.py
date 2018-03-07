@@ -14,7 +14,7 @@ def main():
 
     # get no of users 
     noUsers = db.session.query(user).count()
-    print('Number of users is: {}'.format(noUsers))
+    # print('Number of users is: {}'.format(noUsers))
     content = dict()
 
     # Info for Coffe 
